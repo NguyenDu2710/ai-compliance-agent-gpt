@@ -1,0 +1,11 @@
+{
+  "repo": "demo",
+  "src_branch": "main",
+  "dest_branch": "feature",
+  "files": [
+    {
+      "file_path": "test.cs",
+      "diff": "+ Console.WriteLine(\"Hello\");\n+ public void Test() {}"
+    }
+  ]
+}

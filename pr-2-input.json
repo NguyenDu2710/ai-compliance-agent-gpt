@@ -1,0 +1,47 @@
+﻿{
+  "repo": "NguyenDu2710/nuxt-base",
+  "src_branch": "pull/1/head",
+  "dest_branch": "pull_request_base",
+  "files": [
+    {
+      "file_path": "app.vue",
+      "diff": "@@ -1,138 +1,28 @@\n<template>\n  <div class=\"container\">\n-    <!-- Top Bar -->\n-    <div class=\"topbar\">\n-      <div class=\"topbar-right\">\n-        <form class=\"search-input\">\n-          <input type=\"text\" placeholder=\"Tìm kiếm\" />\n-          <button type=\"submit\"><i class=\"fa fa-search\"></i></button>\n-        </form>\n-        <a href=\"#\" class=\"login\">Đăng nhập</a>\n-        <a href=\"#\" class=\"lang\"><span>VN</span></a>\n-        <a href=\"#\" class=\"lang\"><span>EN</span></a>\n-      </div>\n-    </div>\n-    <!-- Header & Menu -->\n-    <header class=\"header\">\n-      ... (removed large static layout)\n+    <TheNavBar />\n     <main class=\"main-content\">\n-      ... (removed sections banner, guide, news, tour, map, vn360)\n+      <TravelGuideView />\n+      <TopNewsView />\n+      <TravelTourView />\n+      <MapView />\n+      <VietNam />\n     </main>\n-    <footer class=\"footer\">...</footer>\n+    <TheFooter />\n  </div>\n</template>"
+    },
+    {
+      "file_path": "components/Maps/MapView.vue",
+      "diff": "@@ -0,0 +1,14 @@\n+<template>\n+  <div>\n+    <section class=\"map\">\n+    <h3>Bản đồ 360</h3>\n+    <div class=\"map-box\">[Bản đồ sẽ hiển thị ở đây]</div>\n+    </section>\n+  </div>\n+</template>"
+    },
+    {
+      "file_path": "components/TheFooter.vue",
+      "diff": "@@ -0,0 +1,35 @@\n+<template>\n+<div>\n+    <footer class=\"footer\">\n+      <div class=\"footer-cols\">\n+        <div>\n+          <img src=\"https://tayho360.vn/upload/admin/files/logo-header.png\" alt=\"Logo\" style=\"width:60px;\">\n+        </div>\n+        <div>\n+          <h4>TRANG THÔNG TIN ĐIỆN TỬ TÂY HỒ 360</h4>\n+          <ul>\n+            <li>Cơ quan chủ quản: UBND phường Tây Hồ – TP. Hà Nội</li>\n+            <li>Địa chỉ: 657 Đ. Lạc Long Quân, Tây Hồ, Hà Nội</li>\n+            <li>Điện thoại: 024 7533396</li>\n+            <li>Email: tayho360@gmail.com</li>\n+          </ul>\n+        </div>\n+      </div>\n+    </footer>\n+</div>\n+</template>"
+    },
+    {
+      "file_path": "components/TheNavBar.vue",
+      "diff": "@@ -0,0 +1,100 @@\n+<template>\n+  <div>\n+    <div class=\"topbar\">...</div>\n+    <header class=\"header\">...</header>\n+  </div>\n+</template>"
+    },
+    {
+      "file_path": "components/Top_News/TopNewsView.vue",
+      "diff": "@@ -0,0 +1,19 @@\n+<template>\n+  <div>\n+    <section class=\"news\">\n+    <h3>Tin tức nổi bật</h3>\n+    </section>\n+  </div>\n+</template>"
+    },
+    {
+      "file_path": "components/Travel_Guide/TravelGuideView.vue",
+      "diff": "@@ -0,0 +1,24 @@\n+<template>\n+  <div>\n+    <section class=\"banner\">\n+    <h2>CHÀO MỪNG BẠN ĐẾN TÂY HỒ 360</h2>\n+    </section>\n+  </div>\n+</template>"
+    },
+    {
+      "file_path": "components/Travel_Tour/TravelTourView.vue",
+      "diff": "@@ -0,0 +1,18 @@\n+<template>\n+  <div>\n+    <section class=\"tour\">\n+    <h3>Tour du lịch</h3>\n+    </section>\n+  </div>\n+</template>"
+    },
+    {
+      "file_path": "components/VietNam/VietNam.vue",
+      "diff": "@@ -0,0 +1,14 @@\n+<template>\n+  <div>\n+    <section class=\"vn360\">\n+    <h3>Việt Nam 360</h3>\n+    </section>\n+  </div>\n+</template>"
+    },
+    {
+      "file_path": "css/main.css",
+      "diff": "@@ -0,0 +1,206 @@\n+body { background: #e9ecef; }\n+/* full styles moved from app.vue */"
+    },
+    {
+      "file_path": "nuxt.config.ts",
+      "diff": "@@ -1,15 +1,14 @@\n export default defineNuxtConfig({\n-  modules: ['@pinia/nuxt'],\n+  modules: ['@pinia/nuxt', '@nuxt/image'],\n+  css: ['~/css/main.css'],\n })"
+    }
+  ]
+}
