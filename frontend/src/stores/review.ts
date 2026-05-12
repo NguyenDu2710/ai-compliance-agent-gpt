@@ -33,14 +33,51 @@ export const useReviewStore = defineStore('review', () => {
   const totalRemoved = computed(() => request.value.files.reduce((sum, file) => sum + countLines(file.diff, '-'), 0))
   const score = computed(() => {
     if (!result.value) return 0
-    const high = result.value.violations.filter((item) => item.severity.toLowerCase() === 'high').length
-    const medium = result.value.violations.filter((item) => item.severity.toLowerCase() === 'medium').length
-    const low = result.value.violations.filter((item) => item.severity.toLowerCase() === 'low').length
-    return Math.max(1, Number((10 - high * 1.4 - medium * 0.8 - low * 0.35).toFixed(1)))
+
+    const violations = result.value.violations
+    const impacts = result.value.impacts
+
+    const high = violations.filter((item) => /high/i.test(item.severity)).length
+    const medium = violations.filter((item) => /medium/i.test(item.severity)).length
+    const low = violations.filter((item) => /low/i.test(item.severity)).length
+
+    const impactHigh = impacts.filter((item) => /high/i.test(item.severity)).length
+    const impactMedium = impacts.filter((item) => /medium/i.test(item.severity)).length
+    const impactLow = impacts.filter((item) => /low/i.test(item.severity)).length
+
+    const recommendationPenalty = result.value.review.merge_recommendation?.status === 'block'
+      ? 2.0
+      : result.value.review.merge_recommendation?.status === 'safe_with_review'
+      ? 0.8
+      : 0
+
+    return Math.max(
+      1,
+      Number(
+        (
+          10 -
+          high * 1.8 -
+          medium * 1.2 -
+          low * 0.6 -
+          impactHigh * 1.4 -
+          impactMedium * 0.9 -
+          impactLow * 0.4 -
+          recommendationPenalty
+        ).toFixed(1),
+      ),
+    )
   })
 
   function countLines(diff: string, marker: '+' | '-') {
     return diff.split('\n').filter((line) => line.startsWith(marker) && !line.startsWith(`${marker}${marker}${marker}`)).length
+  }
+
+  function safeClone<T>(value: T): T {
+    try {
+      return structuredClone(value)
+    } catch {
+      return JSON.parse(JSON.stringify(value)) as T
+    }
   }
 
   function setRequest(next: DiffRequest) {
@@ -59,8 +96,8 @@ export const useReviewStore = defineStore('review', () => {
         id: crypto.randomUUID(),
         title: request.value.repo,
         createdAt: new Date().toISOString(),
-        request: structuredClone(request.value),
-        result: structuredClone(result.value),
+        request: safeClone(request.value),
+        result: safeClone(result.value),
       })
     } catch (err) {
       error.value = getApiErrorMessage(err, 'Cannot connect to review API.')
@@ -86,8 +123,8 @@ export const useReviewStore = defineStore('review', () => {
         id: crypto.randomUUID(),
         title: response.request.repo,
         createdAt: new Date().toISOString(),
-        request: structuredClone(response.request),
-        result: structuredClone(response.result),
+        request: safeClone(response.request),
+        result: safeClone(response.result),
       })
     } catch (err) {
       error.value = getApiErrorMessage(err, 'Cannot fetch or review this pull/merge request.')

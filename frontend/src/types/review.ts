@@ -33,20 +33,52 @@ export interface LineChange {
   content: string
 }
 
+export interface Observation {
+  severity: 'critical' | 'high' | 'medium' | 'low'
+  confidence: number
+  category: string
+  message: string
+  impact: string
+  recommendation: string
+}
+
+export interface CodeQuality {
+  cleanliness?: string
+  solid_principles?: string
+  documentation?: string
+  standards_compliance?: string
+  test_coverage?: string
+}
+
 export interface FileReviewSummary {
   file_path: string
-  added_lines: number
-  removed_lines: number
-  skipped: boolean
-  summary: string
-  observations: string[]
-  changes: LineChange[]
+  summary?: string
+  code_quality?: CodeQuality
+  observations?: Observation[]
+  required_actions?: string[]
+  added_lines?: number
+  removed_lines?: number
+  skipped?: boolean
+  changes?: LineChange[]
 }
 
 export interface ReviewNarrative {
   verdict: string
   overview: string
+  merge_recommendation?: {
+    status: 'safe_with_review' | 'block' | 'low_risk'
+    reason: string
+  }
+  key_changes?: string[]
+  risk_assessment?: {
+    behavior_change: boolean
+    breaking_change: boolean
+    security_risk: boolean
+    data_flow_impact: boolean
+    performance_impact: boolean
+  }
   reviewer_notes: string[]
+  required_actions?: string[]
   changed_files: FileReviewSummary[]
 }
 

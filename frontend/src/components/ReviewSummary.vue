@@ -2,7 +2,10 @@
   <aside class="summary-panel">
     <div class="panel-head">
       <h2><Sparkles :size="18" /> AI Review Summary</h2>
-      <div class="score-ring">{{ displayScore }}</div>
+      <div>
+        <div class="score-ring">{{ displayScore }}</div>
+        <p class="score-note">{{ scoreNote }}</p>
+      </div>
     </div>
 
     <p class="overview">{{ store.result?.review.overview || emptyText }}</p>
@@ -42,6 +45,10 @@ const emptyText = 'Upload a diff JSON or run the sample review to see AI review 
 const displayScore = computed(() => (store.result ? store.score.toFixed(1) : '--'))
 const issues = computed(() => [...(store.result?.violations ?? []), ...(store.result?.impacts ?? [])])
 const hasSecurity = computed(() => issues.value.some((issue) => /secret|token|security|auth/i.test(issueText(issue))))
+const scoreNote = computed(() => {
+  if (!store.result) return 'Score is a heuristic estimate based on review findings.'
+  return 'Score is a heuristic estimate based on severity and number of review findings.'
+})
 
 const metrics = computed(() => [
   { label: 'Code Quality', icon: Code2, text: store.result ? 'Good' : 'Pending', state: 'good' },

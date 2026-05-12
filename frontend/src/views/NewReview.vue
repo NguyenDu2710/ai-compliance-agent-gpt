@@ -12,10 +12,6 @@
             <b class="remove">-{{ store.totalRemoved }}</b>
           </p>
         </div>
-        <button class="primary" @click="store.submitReview" :disabled="store.loading">
-          <RefreshCw :size="16" :class="{ spin: store.loading }" />
-          Re-run Review
-        </button>
       </div>
 
       <div class="input-strip">
@@ -27,8 +23,8 @@
             @keyup.enter="store.submitReviewFromUrl"
           />
           <button @click="store.submitReviewFromUrl" :disabled="store.loading">
-            <GitPullRequestArrow :size="16" />
-            Fetch & Review
+            <GitPullRequestArrow :size="16" :class="{ spin: store.loading }" />
+            {{ store.loading ? 'Fetching...' : 'Fetch & Review' }}
           </button>
         </div>
         <RouterLink class="provider-status" to="/api-config">
@@ -44,10 +40,10 @@
         <span v-if="store.error" class="error-text">{{ store.error }}</span>
       </div>
 
-      <DiffViewer />
-
       <section class="comment-card">
-        <h2><Bot :size="18" /> AI Review Comment</h2>
+        <div class="comment-card-head">
+          <h2><Bot :size="18" /> AI Review Comment</h2>
+        </div>
         <p>{{ store.result?.review.verdict || 'Ready to review this pull request.' }}</p>
         <ul>
           <li v-for="note in notes" :key="note">{{ note }}</li>
@@ -57,10 +53,14 @@
           <span>{{ store.loading ? 'Running...' : 'Ready' }}</span>
         </footer>
       </section>
+
+      <DiffViewer />
     </section>
 
     <section class="side-column">
-      <ReviewSummary />
+      <div class="summary-wrapper">
+        <ReviewSummary />
+      </div>
       <section class="history-card">
         <div class="history-head">
           <h2>Review History</h2>
@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { computed } from 'vue'
-import { Bot, FileJson2, Github, GitPullRequestArrow, KeyRound, RefreshCw, Search, Upload } from 'lucide-vue-next'
+import { Bot, FileJson2, Github, GitPullRequestArrow, KeyRound, Search, Upload } from 'lucide-vue-next'
 import DiffViewer from '@/components/DiffViewer.vue'
 import ReviewSummary from '@/components/ReviewSummary.vue'
 import { useReviewStore } from '@/stores/review'
@@ -95,7 +95,7 @@ const tokenStatus = computed(() => {
 })
 
 function loadSample() {
-  store.setRequest(structuredClone(sampleReviewRequest))
+  store.setRequest(JSON.parse(JSON.stringify(sampleReviewRequest)))
 }
 
 async function readFile(event: Event) {
