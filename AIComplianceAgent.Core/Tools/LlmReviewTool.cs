@@ -36,28 +36,6 @@ public class LlmReviewTool : ILlmReviewTool
 
     private static bool IsValidReviewJson(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        try
-        {
-            using var document = JsonDocument.Parse(value);
-            var root = document.RootElement;
-            return root.ValueKind == JsonValueKind.Object &&
-                root.TryGetProperty("status", out _) &&
-                root.TryGetProperty("violations", out var violations) &&
-                violations.ValueKind == JsonValueKind.Array &&
-                root.TryGetProperty("impacts", out var impacts) &&
-                impacts.ValueKind == JsonValueKind.Array &&
-                root.TryGetProperty("review", out var review) &&
-                review.ValueKind == JsonValueKind.Object &&
-                root.TryGetProperty("summary", out _);
-        }
-        catch (JsonException)
-        {
-            return false;
-        }
+        return ReviewJsonValidator.IsValid(value);
     }
 }

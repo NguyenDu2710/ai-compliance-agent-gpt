@@ -23,9 +23,12 @@ public class GitLabClient : IGitProviderClient
         }
     }
 
-    public async Task<DiffRequest> GetMergeRequestDiffAsync(string projectId, int mergeRequestIid)
+    public async Task<DiffRequest> GetMergeRequestDiffAsync(string projectId, int mergeRequestIid, string? token = null)
     {
-        using var response = await _httpClient.GetAsync($"/api/v4/projects/{Uri.EscapeDataString(projectId)}/merge_requests/{mergeRequestIid}/changes");
+        using var message = new HttpRequestMessage(HttpMethod.Get, $"/api/v4/projects/{Uri.EscapeDataString(projectId)}/merge_requests/{mergeRequestIid}/changes");
+        ApplyAuthorization(message, token);
+
+        using var response = await _httpClient.SendAsync(message);
         response.EnsureSuccessStatusCode();
 
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -106,4 +109,13 @@ public class GitLabClient : IGitProviderClient
         _config["GitLab:BaseUrl"] ??
         Environment.GetEnvironmentVariable("GITLAB_BASE_URL") ??
         "https://gitlab.com";
+
+    private void ApplyAuthorization(HttpRequestMessage message, string? token)
+    {
+        var effectiveToken = string.IsNullOrWhiteSpace(token) ? Token : token.Trim();
+        if (!string.IsNullOrWhiteSpace(effectiveToken))
+        {
+            message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", effectiveToken);
+        }
+    }
 }

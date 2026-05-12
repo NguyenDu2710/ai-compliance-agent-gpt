@@ -24,9 +24,12 @@ public class GitHubClient : IGitProviderClient
         }
     }
 
-    public async Task<DiffRequest> GetPullRequestDiffAsync(string owner, string repo, int pullNumber)
+    public async Task<DiffRequest> GetPullRequestDiffAsync(string owner, string repo, int pullNumber, string? token = null)
     {
-        using var response = await _httpClient.GetAsync($"/repos/{owner}/{repo}/pulls/{pullNumber}/files");
+        using var message = new HttpRequestMessage(HttpMethod.Get, $"/repos/{owner}/{repo}/pulls/{pullNumber}/files");
+        ApplyAuthorization(message, token);
+
+        using var response = await _httpClient.SendAsync(message);
         response.EnsureSuccessStatusCode();
 
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -62,6 +65,11 @@ public class GitHubClient : IGitProviderClient
         };
     }
 
+    Task<DiffRequest> IGitProviderClient.GetPullRequestDiffAsync(string owner, string repo, int pullNumber)
+    {
+        return GetPullRequestDiffAsync(owner, repo, pullNumber);
+    }
+
     public async Task PostReviewCommentAsync(string owner, string repo, int pullNumber, string markdown)
     {
         var body = JsonSerializer.Serialize(new { body = markdown });
@@ -93,4 +101,13 @@ public class GitHubClient : IGitProviderClient
     }
 
     private string Token => _config["GitHub:Token"] ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN") ?? string.Empty;
+
+    private void ApplyAuthorization(HttpRequestMessage message, string? token)
+    {
+        var effectiveToken = string.IsNullOrWhiteSpace(token) ? Token : token.Trim();
+        if (!string.IsNullOrWhiteSpace(effectiveToken))
+        {
+            message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", effectiveToken);
+        }
+    }
 }
