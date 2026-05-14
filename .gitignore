@@ -9,6 +9,7 @@ TestResults/
 .vs/
 .vscode/
 .idea/
+.artifacts/
 *.suo
 *.user
 *.userosscache
